@@ -20,6 +20,12 @@ function LoadingWidget() {
   );
 }
 
+const answerStates = {
+  unanswered: '',
+  wrong: db.theme.colors.wrong,
+  success: db.theme.colors.success,
+};
+
 function QuestionWidget({ 
   question, 
   totalQuestions,
@@ -27,8 +33,13 @@ function QuestionWidget({
   onSubmit,
 }) {
   const questionId = `question__${questionIndex}`;
+  const [answer, setAnswerState] = React.useState(answerStates.unanswered);
   return (
-    <Widget>
+    <Widget
+      style={{
+        backgroundColor: `${answer}`
+      }}
+    >
       <Widget.Header>
         {/* <BackLinkArrow href="/" /> */}
         <h3>
@@ -58,6 +69,8 @@ function QuestionWidget({
         <form 
           onSubmit={(eventInfo) => {
             eventInfo.preventDefault();
+            console.log(eventInfo.target);
+            setAnswerState(answerStates.wrong);
             onSubmit();
         }}>
           {question.alternatives.map((alternative, alternativeIndex) => {
@@ -66,22 +79,23 @@ function QuestionWidget({
               <Widget.Topic
                 as="label"
                 htmlFor={alternativeId}
+                //style={{ backgroundColor: `${db.theme.colors.success}` }}
               >
                 <input 
                   //style={{ display: 'none' }}
                   id={alternativeId}
                   name={questionId}
                   type="radio"
+                  //onSelect=
                 />
                 {alternative}
               </Widget.Topic>
             );
           })}
+          <Button type="submit">
+            Confirmar
+          </Button>
         </form>
-
-        <Button type="submit">
-          Confirmar
-        </Button>
       </Widget.Content>
     </Widget>
   );
@@ -99,6 +113,7 @@ export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = React.useState(0);
   const questionIndex = currentQuestion;
   const question = db.questions[questionIndex];
+  const selectedAlternative = '';
 
   React.useEffect(() => {
     setTimeout(() => {
@@ -108,6 +123,7 @@ export default function QuizPage() {
   
   function handleSubmitQuiz() {
     const nextQuestion = questionIndex + 1;
+
     if (nextQuestion < totalQuestions) {
       setCurrentQuestion(nextQuestion);
     } else {
